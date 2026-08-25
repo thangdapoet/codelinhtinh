@@ -27,8 +27,8 @@ const char* mqtt_topic_cmd = "quangthang/smartlock/cmd";
 
 const int SERVO_PIN = 15;
 int SERVO_NEUTRAL = 1500; 
-const int SERVO_OPEN = 1700;
-const int SERVO_CLOSE = 1310;
+const int SERVO_OPEN = 1310;
+const int SERVO_CLOSE = 1700;
 const int SERVO_DELAY = 800;
 
 const int BUZZ_PIN = 17;
@@ -499,7 +499,8 @@ void handleLedChase() {
   if (millis() - lastLedTime > 200) {
     lastLedTime = millis();
     strip.clear();
-    strip.setPixelColor(chaseStep, strip.Color(255, 255, 0)); 
+    int reversedIndex = (NUM_LEDS - 1) - chaseStep;
+   strip.setPixelColor(reversedIndex, strip.Color(255, 255, 0));
     strip.show();
     chaseStep++;
     if (chaseStep >= NUM_LEDS) chaseStep = 0;
