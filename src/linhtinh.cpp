@@ -972,7 +972,7 @@ void adminMenu() {
   lcd.setCursor(0,1);
   lcd.print("1:CHG 2:DEL 3:ADD");
   lcd.setCursor(0,2);
-  lcd.print("C:Exit");
+  lcd.print("D:Exit");
   
   unsigned long start = millis();
   while (millis() - start < 15000UL) { 
@@ -991,7 +991,7 @@ void adminMenu() {
     if (k == '1') {
       lcd.clear(); lcd.setCursor(0,0); lcd.print("CHANGE PASS");
       lcd.setCursor(0,1); lcd.print("New pass:");
-      lcd.setCursor(0,3); lcd.print("*:Del #:Ent C:Exit");
+      lcd.setCursor(0,3); lcd.print("*:Del #:Ent D:Exit");
       
       String newPw = "";
       unsigned long t0 = millis();
@@ -1036,7 +1036,7 @@ void adminMenu() {
     if (k == '2') {
       lcd.clear(); 
       lcd.setCursor(0,0); lcd.print("DEL TAG: Scan");
-      lcd.setCursor(0,1); lcd.print("C: Cancel");
+      lcd.setCursor(0,1); lcd.print("D: Cancel");
       
       String uid;
       int status = waitForCardOrCancel(uid, 15000UL); 
@@ -1080,7 +1080,7 @@ void adminMenu() {
     if (k == '3') {
       lcd.clear(); 
       lcd.setCursor(0,0); lcd.print("ADD TAG: Scan");
-      lcd.setCursor(0,1); lcd.print("C: Cancel");
+      lcd.setCursor(0,1); lcd.print("D: Cancel");
       
       String uid;
       int status = waitForCardOrCancel(uid, 15000UL); 
@@ -1170,7 +1170,6 @@ void processPassword() {
 
   if (passOk || otpOk) {
     if (otpOk) {
-      // Nếu mở bằng OTP -> Vô hiệu hóa OTP ngay lập tức
       isOtpActive = false;
       otpCode = "";
     } else {
