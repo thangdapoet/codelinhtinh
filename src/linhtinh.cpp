@@ -10,10 +10,7 @@
 #include <PubSubClient.h>
 #include <Adafruit_NeoPixel.h>
 
-// ==========================================
-// 1. CẤU HÌNH & HẰNG SỐ (CONSTANTS & PINS)
-// ==========================================
-// Cấu hình biến toàn cục
+/// cac bien va hang so
 const char* ssid = "Thang";         
 const char* password = "15112004";        
 const char* mqtt_server = "broker.emqx.io";    
@@ -49,9 +46,7 @@ const int MAX_CARDS = 60;
 const unsigned long SLEEP_TIMEOUT = 15000UL; 
 const unsigned long OTP_TIMEOUT = 600000UL; //
 
-// ==========================================
-// 2. BIẾN TOÀN CỤC & ĐỐI TƯỢNG (GLOBALS)
-// ==========================================
+/// cac bien toan cuc
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
 unsigned long lastReconnectAttempt = 0;
@@ -75,7 +70,6 @@ byte myCustomKey[6] = {0x15, 0x11, 0x20, 0x04, 0x0A, 0x0B};
 byte secretData[16] = {'Q','U','A','N','G','T','H','A','N','G','_','S','E','C','U','R'};
 
 Adafruit_NeoPixel strip(NUM_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800);
-// Biến cho LED chớp Non-blocking
 unsigned long lastLedTime = 0;
 bool isRedOn = false;
 int chaseStep = 0;
@@ -110,9 +104,7 @@ bool isOtpActive = false;
 // flag de check trang thai cua, tranh mo cua nhieu lan tu web
 bool isDoorOperating = false; 
 
-// ==========================================
-// 3. KHAI BÁO HÀM (FORWARD DECLARATIONS)
-// ==========================================
+///khai bao ham
 void setAllLeds(int r, int g, int b);
 void blinkLeds(int r, int g, int b, int times);
 void blinkAndBuzz(int r, int g, int b, int times, int buzzDuty = 180, unsigned long onTime = 200, unsigned long offTime = 150);
@@ -154,16 +146,12 @@ void processPassword();
 void triggerFaceAuth();
 void keypadEvent(KeypadEvent key);
 
-// ==========================================
-// 4. CHƯƠNG TRÌNH CHÍNH (SETUP & LOOP)
-// ==========================================
+///setup va loop
 void setup() {
   Serial.begin(9600);
   delay(200);
   
   pinMode(MC38_PIN, INPUT_PULLUP);
-  
-  // Nút nhấn cơ kết hợp trở kéo 27k Ohm bên ngoài
   pinMode(TOUCH_PIN, INPUT);
   
   strip.begin();
@@ -213,17 +201,13 @@ void loop() {
     isOtpActive = false;
     otpCode = "";
   }
-  // --- LOGIC ĐỌC NÚT NHẤN CƠ (EXIT BUTTON) ---
   if (digitalRead(TOUCH_PIN) == HIGH) {
-    delay(50); // Chống dội phím (Debounce) cơ bản
-    if (digitalRead(TOUCH_PIN) == HIGH) { // Xác nhận lại lần nữa tránh nhiễu
+    delay(50); 
+    if (digitalRead(TOUCH_PIN) == HIGH) { 
       if (alarmActive) stopAlarm();
       
       openDoor("", false); 
       if (!alarmActive) setAllLeds(255, 255, 0); 
-      
-      // Chờ người dùng thả nút nhấn ra để không bị mở liên tục
-      // Cài đặt timeout tối đa 3 giây đề phòng rủi ro nút cơ kẹt cứng
       unsigned long btnWait = millis();
       while(digitalRead(TOUCH_PIN) == HIGH) {
         handleWiFiAndMQTT(); 
@@ -469,9 +453,7 @@ void loop() {
   delay(10);
 }
 
-// ==========================================
-// 5. CÁC HÀM TIỆN ÍCH & PHẦN CỨNG (UTILITIES)
-// ==========================================
+//////////
 void setAllLeds(int r, int g, int b) {
   for(int i = 0; i < NUM_LEDS; i++) strip.setPixelColor(i, strip.Color(r, g, b));
   strip.show(); 
@@ -561,9 +543,7 @@ void wakeUpLcdIfNeeded() {
   }
 }
 
-// ==========================================
-// 6. CÁC HÀM QUẢN LÝ BỘ NHỚ (PREFERENCES)
-// ==========================================
+/////////
 String loadPassword() { 
   String pw = prefs.getString("pw", "");
   if (pw == "") { pw = "1234"; prefs.putString("pw", pw); }
@@ -607,9 +587,7 @@ bool isAllowedInMem(const String &uidIn){
   return false;
 }
 
-// ==========================================
-// 7. CÁC HÀM MẠNG & MQTT (WIFI / MQTT)
-// ==========================================
+/////////////
 void handleWiFiAndMQTT() {  
   bool isConnected = (WiFi.status() == WL_CONNECTED);
   
@@ -681,11 +659,11 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
     }}
     else if (message == "WEB_STOP_ALARM") {
       if (alarmActive) {
-        Serial.println("Nhận lệnh tắt báo động từ Web!");
         stopAlarm(); 
+        setAllLeds(0, 255, 0);
         lcd.clear(); lcd.setCursor(0, 0); lcd.print("Web Stopped!");
         buzz(160, 120); delay(1500);
-        wrongCount = 0; inputBuf = ""; showMainPrompt(); 
+        wrongCount = 0; inputBuf = ""; showMainPrompt(); setAllLeds(255, 255, 0);
       }
     }
     else if (message.startsWith("WEB_SET_OTP: ")) {
@@ -714,9 +692,7 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
   }
 }
 
-// ==========================================
-// 8. CÁC HÀM XỬ LÝ BLOCK BẢO MẬT RFID
-// ==========================================
+/////////////////
 bool writeSecureBlock() { 
   return true; //////////////////////////////
   MFRC522::StatusCode status;
@@ -818,9 +794,7 @@ bool resetSecureBlock() {
   return true;
 }
 
-// ==========================================
-// 9. CÁC HÀM LOGIC HOẠT ĐỘNG (CORE LOGIC)
-// ==========================================
+//////////////
 void performDoorCycle() { 
   isDoorOperating = true;
   wakeUpLcdIfNeeded();
